@@ -9,10 +9,8 @@ TEST(DSVWriterTest, EmptyRowTest){
     EXPECT_TRUE(DataSink->String().empty());
     EXPECT_EQ(DataSink->String(),"");
     EXPECT_TRUE(Writer.WriteRow({}));
-    EXPECT_EQ(DataSink->String(),"");
-
+    EXPECT_EQ(DataSink->String(),"\n");
 }
-
 
 TEST(DSVWriterTest, SingleRowTest){
     std::shared_ptr<CStringDataSink> DataSink = std::make_shared<CStringDataSink>();
@@ -21,8 +19,7 @@ TEST(DSVWriterTest, SingleRowTest){
     EXPECT_TRUE(DataSink->String().empty());
     EXPECT_EQ(DataSink->String(),"");
     EXPECT_TRUE(Writer.WriteRow({"A","B","C"}));
-    EXPECT_EQ(DataSink->String(),"A,B,C");
-
+    EXPECT_EQ(DataSink->String(),"A,B,C\n");
 }
 
 TEST(DSVWriterTest, DifferentDelimiterTest){
@@ -31,7 +28,7 @@ TEST(DSVWriterTest, DifferentDelimiterTest){
 
     EXPECT_TRUE(DataSink->String().empty());
     EXPECT_TRUE(Writer.WriteRow({"A","B","C"}));
-    EXPECT_EQ(DataSink->String(),"A|B|C");
+    EXPECT_EQ(DataSink->String(),"A|B|C\n");
 }
 
 TEST(DSVWriterTest, EmptyFieldTest){
@@ -39,7 +36,7 @@ TEST(DSVWriterTest, EmptyFieldTest){
     CDSVWriter Writer(DataSink,',');
 
     EXPECT_TRUE(Writer.WriteRow({"A","","C"}));
-    EXPECT_EQ(DataSink->String(),"A,,C");
+    EXPECT_EQ(DataSink->String(),"A,,C\n");
 }
 
 TEST(DSVWriterTest, SingleFieldTest){
@@ -47,7 +44,7 @@ TEST(DSVWriterTest, SingleFieldTest){
     CDSVWriter Writer(DataSink,',');
 
     EXPECT_TRUE(Writer.WriteRow({"Hello"}));
-    EXPECT_EQ(DataSink->String(),"Hello");
+    EXPECT_EQ(DataSink->String(),"Hello\n");
 }
 
 TEST(DSVWriterTest, MultipleWriteRowAppendTest){
@@ -55,8 +52,8 @@ TEST(DSVWriterTest, MultipleWriteRowAppendTest){
     CDSVWriter Writer(DataSink,',');
 
     EXPECT_TRUE(Writer.WriteRow({"A","B"}));
-    EXPECT_EQ(DataSink->String(),"A,B");
+    EXPECT_EQ(DataSink->String(),"A,B\n");
 
     EXPECT_TRUE(Writer.WriteRow({"1","2"}));
-    EXPECT_EQ(DataSink->String(),"A,B1,2");
+    EXPECT_EQ(DataSink->String(),"A,B\n1,2\n");
 }
