@@ -29,12 +29,19 @@ TEST_LDFLAGS    = $(LDFLAGS) -L $(shell brew --prefix)/lib -lgtest -lgtest_main 
 TEST_STR_OBJ_FILES         = $(TESTOBJ_DIR)/StringUtilsTest.o $(TESTOBJ_DIR)/StringUtils.o
 TEST_STRSRC_OBJ_FILES      = $(TESTOBJ_DIR)/StringDataSource.o $(TESTOBJ_DIR)/StringDataSourceTest.o
 TEST_STRSINK_OBJ_FILES     = $(TESTOBJ_DIR)/StringDataSink.o $(TESTOBJ_DIR)/StringDataSinkTest.o
-TEST_DSV_OBJ_FILES         = $(TESTOBJ_DIR)/StringDataSink.o $(TESTOBJ_DIR)/DSVWriter.o $(TESTOBJ_DIR)/DSVTest.o
+
+TEST_DSV_OBJ_FILES         = $(TESTOBJ_DIR)/StringDataSink.o \
+                             $(TESTOBJ_DIR)/StringDataSource.o \
+							 $(TESTOBJ_DIR)/StringUtils.o \
+                             $(TESTOBJ_DIR)/DSVWriter.o \
+                             $(TESTOBJ_DIR)/DSVReader.o \
+                             $(TESTOBJ_DIR)/DSVTest.o
+
 TEST_XML_OBJ_FILES         = $(TESTOBJ_DIR)/StringDataSink.o \
                              $(TESTOBJ_DIR)/StringDataSource.o \
                              $(TESTOBJ_DIR)/XMLWriter.o \
                              $(TESTOBJ_DIR)/XMLReader.o \
-                             $(TESTOBJ_DIR)/XMLTest.o
+                             $(TESTOBJ_DIR)/XMLTest.o \
 
 
 

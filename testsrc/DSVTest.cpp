@@ -1,6 +1,11 @@
 #include <gtest/gtest.h>
+
 #include "DSVWriter.h"
+#include "DSVReader.h"
+
 #include "StringDataSink.h"
+#include "StringDataSource.h"
+// writer test
 
 TEST(DSVWriterTest, EmptyRowTest){
     std::shared_ptr<CStringDataSink> DataSink = std::make_shared<CStringDataSink>();
@@ -56,4 +61,78 @@ TEST(DSVWriterTest, MultipleWriteRowAppendTest){
 
     EXPECT_TRUE(Writer.WriteRow({"1","2"}));
     EXPECT_EQ(DataSink->String(),"A,B\n1,2\n");
+}
+
+
+// reader test
+
+
+TEST(DSVReaderTest, EmptyTest){
+    auto src = std::make_shared<CStringDataSource>("");
+    CDSVReader r(src, ',');
+
+    std::vector<std::string> row;
+    EXPECT_FALSE(r.ReadRow(row));
+    EXPECT_TRUE(r.End());
+    EXPECT_TRUE(row.empty());
+}
+
+TEST(DSVReaderTest, OneRowTest){
+    auto src = std::make_shared<CStringDataSource>("X,Y,Z\n");
+    CDSVReader r(src, ',');
+
+    std::vector<std::string> row;
+    EXPECT_TRUE(r.ReadRow(row));
+    ASSERT_EQ(row.size(), 3u);
+    EXPECT_EQ(row[0], "X");
+    EXPECT_EQ(row[1], "Y");
+    EXPECT_EQ(row[2], "Z");
+
+    row.clear();
+    EXPECT_FALSE(r.ReadRow(row));
+}
+
+TEST(DSVReaderTest, TwoRowTest){
+    auto src = std::make_shared<CStringDataSource>("X,Y\n1,2\n");
+    CDSVReader r(src, ',');
+
+    std::vector<std::string> row;
+
+    EXPECT_TRUE(r.ReadRow(row));
+    ASSERT_EQ(row.size(), 2u);
+    EXPECT_EQ(row[0], "X");
+    EXPECT_EQ(row[1], "Y");
+
+    row.clear();
+    EXPECT_TRUE(r.ReadRow(row));
+    ASSERT_EQ(row.size(), 2u);
+    EXPECT_EQ(row[0], "1");
+    EXPECT_EQ(row[1], "2");
+
+    row.clear();
+    EXPECT_FALSE(r.ReadRow(row));
+}
+
+TEST(DSVReaderTest, EmptyColTest){
+    auto src = std::make_shared<CStringDataSource>("X,,Z\n");
+    CDSVReader r(src, ',');
+
+    std::vector<std::string> row;
+    EXPECT_TRUE(r.ReadRow(row));
+    ASSERT_EQ(row.size(), 3u);
+    EXPECT_EQ(row[0], "X");
+    EXPECT_EQ(row[1], "");
+    EXPECT_EQ(row[2], "Z");
+}
+
+TEST(DSVReaderTest, OtherDelimTest){
+    auto src = std::make_shared<CStringDataSource>("X|Y|Z\n");
+    CDSVReader r(src, '|');
+
+    std::vector<std::string> row;
+    EXPECT_TRUE(r.ReadRow(row));
+    ASSERT_EQ(row.size(), 3u);
+    EXPECT_EQ(row[0], "X");
+    EXPECT_EQ(row[1], "Y");
+    EXPECT_EQ(row[2], "Z");
 }
