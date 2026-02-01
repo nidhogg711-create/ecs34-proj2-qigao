@@ -2,7 +2,7 @@
 
 Student 1: Prithika Thilakarajan (923266507)
 
-Student 2: Qi Gao (123456987)
+Student 2: Qi Gao (921902627)
 
 ## Project Status
 The project is complete and builds successfully. All required functionality for DSV reading/writing and XML reading/writing has been implemented, and all provided tests pass. Code coverage requirements have also been met.
@@ -144,5 +144,78 @@ You can store XML text in a CStringDataSource, call ReadEntity, and verify the r
 ## Changes 6
     I implemented my own XMLReader tests to verify parsing behavior for start and end tags, character data, attribute handling, self closing elements, skipping character data, multiple top level elements, and end of input conditions.
 
+
+## S2 Prompt 1
+
+Why is my DSVWriter unit test failing even though the output looks correct?
+
+## S2 Response 1
+
+Most DSV/CSV writers append a newline at the end of each row. If your test expects "A,B,C" but the writer outputs "A,B,C\n", the string comparison will fail.
+Fix: update expected strings in tests to include \n at the end of each WriteRow call.
+
+EXPECT_TRUE(w.WriteRow({"A","B","C"}));
+EXPECT_EQ(sink->String(), "A,B,C\n");
+
+## S2 Changes 1
+
+I updated my DSVWriter tests to match the writer behavior by expecting a newline at the end of every written row, including the empty row case (expected output becomes just "\n").
+
+
+## S2 Prompt 2
+
+How can I verify that my DSVWriter correctly appends multiple rows instead of overwriting output?
+
+## S2 Response 2
+
+Use a CStringDataSink to capture output, call WriteRow multiple times, and compare the final string. This ensures the writer appends rows correctly and includes delimiters and newlines for each call.
+
+w.WriteRow({"A","B"});
+w.WriteRow({"1","2"});
+EXPECT_EQ(sink->String(), "A,B\n1,2\n");
+
+## S2 Changes 2
+
+I added a unit test that writes multiple rows sequentially and verifies that each row is appended with a newline, ensuring no data is overwritten between calls.
+
+## S2 Prompt 3
+
+How do I implement a simple DSVReader that reads rows correctly from a CDataSource?
+
+## S2 Response 3
+
+A simple DSVReader can read characters one at a time until it encounters a newline (\n) or reaches the end of the source. The collected line can then be split using the delimiter. Ignoring carriage returns (\r) helps support Windows-style line endings.
+
+Basic steps:
+	•	Return false if the source is already at end
+	•	Read characters using Get
+	•	Stop at \n
+	•	Ignore \r
+	•	Split the line by the delimiter
+
+## S2 Changes 3
+
+I implemented CDSVReader::ReadRow to read input character-by-character, stop on newline, ignore carriage returns, and split the line using StringUtils::Split to produce the output vector.
+
+⸻
+
+## S2 Prompt 4
+
+How do I write unit tests for my DSVReader using GoogleTest?
+
+## S2 Response 4
+
+Store DSV-formatted text in a CStringDataSource, repeatedly call ReadRow, and verify both the returned row contents and the function’s return value. Tests should cover empty input, multiple rows, empty fields, and alternate delimiters.
+auto src = std::make_shared<CStringDataSource>("X,Y\n1,2\n");
+CDSVReader r(src, ',');
+std::vector<std::string> row;
+
+EXPECT_TRUE(r.ReadRow(row));  // {"X","Y"}
+EXPECT_TRUE(r.ReadRow(row));  // {"1","2"}
+EXPECT_FALSE(r.ReadRow(row)); // end of input
+
+## S2 Changes 4
+
+I added GoogleTest cases for empty input, single-row input, multiple rows, empty columns, and non-comma delimiters to confirm that ReadRow behaves correctly and stops at end-of-input.
     
 
